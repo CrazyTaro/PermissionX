@@ -20,7 +20,6 @@ import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -29,8 +28,7 @@ import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam
 import com.permissionx.guolindev.callback.ForwardToSettingsCallback
 import com.permissionx.guolindev.callback.RequestCallback
 import com.permissionx.guolindev.dialog.DefaultDialog
-import com.permissionx.guolindev.dialog.RationaleDialog
-import com.permissionx.guolindev.dialog.RationaleDialogFragment
+import com.permissionx.guolindev.dialog.PermissionDialogInterface
 import java.util.*
 
 /**
@@ -299,87 +297,42 @@ class PermissionBuilder(
     fun showHandlePermissionDialog(
         chainTask: ChainTask,
         showReasonOrGoSettings: Boolean,
-        dialog: RationaleDialog
+        dialog: PermissionDialogInterface
     ) {
         showDialogCalled = true
-        val permissions = dialog.permissionsToRequest
+        val permissions = dialog.getPermissionsToRequest()
         if (permissions.isEmpty()) {
             chainTask.finish()
             return
         }
-        currentDialog = dialog
-        dialog.show()
+        currentDialog = dialog as? Dialog
+        if (!dialog.showDialog()) {
+            dialog.showDialogFragment(fragmentManager, "PermissionXRationaleDialogFragment")
+        }
         if (dialog is DefaultDialog && dialog.isPermissionLayoutEmpty()) {
             // No valid permission to show on the dialog.
             // We call dismiss instead.
             dialog.dismiss()
             chainTask.finish()
         }
-        val positiveButton = dialog.positiveButton
-        val negativeButton = dialog.negativeButton
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
-        positiveButton.isClickable = true
-        positiveButton.setOnClickListener {
-            dialog.dismiss()
+        //we have to call show dialog first,cause the view will be created only in `onCreate` method not in constructor.
+        //otherwise we may get a NullPointerException when calling setPositiveAction or setNegativeAction
+        dialog.setDialogCancelable(false)
+        dialog.setDialogCanceledOnTouchOutside(false)
+        dialog.setPositiveAction {
+            it.dismissDialog()
             if (showReasonOrGoSettings) {
                 chainTask.requestAgain(permissions)
             } else {
                 forwardToSettings(permissions)
             }
         }
-        if (negativeButton != null) {
-            negativeButton.isClickable = true
-            negativeButton.setOnClickListener {
-                dialog.dismiss()
-                chainTask.finish()
-            }
-        }
-        currentDialog?.setOnDismissListener {
-            currentDialog = null
-        }
-    }
-
-    /**
-     * This method is internal, and should not be called by developer.
-     *
-     *
-     * Show a DialogFragment to user and  explain why these permissions are necessary.
-     *
-     * @param chainTask              Instance of current task.
-     * @param showReasonOrGoSettings Indicates should show explain reason or forward to Settings.
-     * @param dialogFragment         DialogFragment to explain to user why these permissions are necessary.
-     */
-    fun showHandlePermissionDialog(
-        chainTask: ChainTask,
-        showReasonOrGoSettings: Boolean,
-        dialogFragment: RationaleDialogFragment
-    ) {
-        showDialogCalled = true
-        val permissions = dialogFragment.permissionsToRequest
-        if (permissions.isEmpty()) {
+        dialog.setNegativeAction {
+            it.dismissDialog()
             chainTask.finish()
-            return
         }
-        dialogFragment.showNow(fragmentManager, "PermissionXRationaleDialogFragment")
-        val positiveButton = dialogFragment.positiveButton
-        val negativeButton = dialogFragment.negativeButton
-        dialogFragment.isCancelable = false
-        positiveButton.isClickable = true
-        positiveButton.setOnClickListener {
-            dialogFragment.dismiss()
-            if (showReasonOrGoSettings) {
-                chainTask.requestAgain(permissions)
-            } else {
-                forwardToSettings(permissions)
-            }
-        }
-        if (negativeButton != null) {
-            negativeButton.isClickable = true
-            negativeButton.setOnClickListener(View.OnClickListener {
-                dialogFragment.dismiss()
-                chainTask.finish()
-            })
+        dialog.setDismissListener {
+            currentDialog = null
         }
     }
 
@@ -486,7 +439,10 @@ class PermissionBuilder(
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", activity.packageName, null)
         intent.data = uri
-        invisibleFragment.startActivityForResult(intent, InvisibleFragment.FORWARD_TO_SETTINGS)
+        //maybe current system does not support
+        if (activity.packageManager.resolveActivity(intent, 0) != null) {
+            invisibleFragment.startActivityForResult(intent, InvisibleFragment.FORWARD_TO_SETTINGS)
+        }
     }
 
     /**

@@ -22,17 +22,19 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 /**
- *  Base DialogFragment class to inherits to display a rationale dialog and show user why you need the permissions that you asked.
- *  Your DialogFragment must have a positive button to proceed request and an optional negative button to cancel request. Override
- *  {@link RationaleDialogFragment#getPositiveButton()} and {@link RationaleDialogFragment#getNegativeButton()} to implement that.
- *  @author guolin
- *  @since 2020/9/1
+ * Base DialogFragment class to inherits to display a rationale dialog and show user why you need the permissions that you asked.
+ * Your DialogFragment must have a positive button to proceed request and an optional negative button to cancel request. Override
+ * {@link RationaleDialogFragment#getPositiveButton()} and {@link RationaleDialogFragment#getNegativeButton()} to implement that.
+ *
+ * @author guolin
+ * @since 2020/9/1
  */
-public abstract class RationaleDialogFragment extends DialogFragment {
+public abstract class RationaleDialogFragment extends DialogFragment implements PermissionDialogInterface {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,22 +46,74 @@ public abstract class RationaleDialogFragment extends DialogFragment {
 
     /**
      * Return the instance of positive button on the DialogFragment. Your DialogFragment must have a positive button to proceed request.
+     *
      * @return The instance of positive button on the DialogFragment.
      */
-    abstract public @NonNull View getPositiveButton();
+    abstract public @NonNull
+    View getPositiveButton();
 
     /**
      * Return the instance of negative button on the DialogFragment.
      * If the permissions that you request are mandatory, your DialogFragment can have no negative button.
      * In this case, you can simply return null.
+     *
      * @return The instance of positive button on the DialogFragment, or null if your DialogFragment has no negative button.
      */
-    abstract public @Nullable View getNegativeButton();
+    abstract public @Nullable
+    View getNegativeButton();
 
-    /**
-     * Provide permissions to request. These permissions should be the ones that shows on your RationaleDialogFragment.
-     * @return Permissions list to request.
-     */
-    abstract public @NonNull List<String> getPermissionsToRequest();
+    @Override
+    public void setPositiveAction(@NotNull PermissionPositiveCallback callback) {
+        getPositiveButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.onPositiveAction(RationaleDialogFragment.this);
+            }
+        });
+    }
 
+    @Override
+    public void setNegativeAction(@NotNull PermissionNegativeCallback callback) {
+        View view = getNegativeButton();
+        if (view != null) {
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callback.onNegativeAction(RationaleDialogFragment.this);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void setDismissListener(@NotNull PermissionDismissCallback callback) {
+        //not support, just ignore
+    }
+
+    @Override
+    public boolean showDialog() {
+        //not support, just ignore
+        return false;
+    }
+
+    @Override
+    public boolean showDialogFragment(@NotNull FragmentManager fm, @NotNull String tag) {
+        showNow(fm, tag);
+        return true;
+    }
+
+    @Override
+    public void dismissDialog() {
+        dismiss();
+    }
+
+    @Override
+    public void setDialogCancelable(boolean cancelable) {
+        setCancelable(cancelable);
+    }
+
+    @Override
+    public void setDialogCanceledOnTouchOutside(boolean cancelable) {
+        //dialog fragment not support so do nothing
+    }
 }
