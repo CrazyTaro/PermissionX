@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.permissionx.guolindev.request
+package com.permissionx.guolilndev.lincolnct.request
 
 import android.Manifest
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
-import com.permissionx.guolindev.PermissionX
+import com.permissionx.guolilndev.lincolnct.PermissionX
 import java.util.*
 
 /**

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.permissionx.guolindev
+package com.permissionx.guolilndev.lincolnct
 
 import android.os.Build
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.permissionx.guolindev.dialog.allSpecialPermissions
-import com.permissionx.guolindev.request.PermissionBuilder
-import com.permissionx.guolindev.request.RequestBackgroundLocationPermission
+import com.permissionx.guolilndev.lincolnct.dialog.allSpecialPermissions
+import com.permissionx.guolilndev.lincolnct.request.PermissionBuilder
+import com.permissionx.guolilndev.lincolnct.request.RequestBackgroundLocationPermission
 import kotlin.collections.LinkedHashSet
 
 /**

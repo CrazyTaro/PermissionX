@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.permissionx.guolindev.dialog;
+package com.permissionx.guolilndev.lincolnct.dialog;
 
 import android.app.Dialog;
 import android.content.Context;

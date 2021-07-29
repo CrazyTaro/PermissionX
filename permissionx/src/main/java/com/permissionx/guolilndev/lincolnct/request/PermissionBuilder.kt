@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.permissionx.guolindev.request
+package com.permissionx.guolilndev.lincolnct.request
 
 import android.Manifest
 import android.app.Dialog
@@ -23,12 +23,12 @@ import android.provider.Settings
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
-import com.permissionx.guolindev.callback.ExplainReasonCallback
-import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam
-import com.permissionx.guolindev.callback.ForwardToSettingsCallback
-import com.permissionx.guolindev.callback.RequestCallback
-import com.permissionx.guolindev.dialog.DefaultDialog
-import com.permissionx.guolindev.dialog.PermissionDialogInterface
+import com.permissionx.guolilndev.lincolnct.callback.ExplainReasonCallback
+import com.permissionx.guolilndev.lincolnct.callback.ExplainReasonCallbackWithBeforeParam
+import com.permissionx.guolilndev.lincolnct.callback.ForwardToSettingsCallback
+import com.permissionx.guolilndev.lincolnct.callback.RequestCallback
+import com.permissionx.guolilndev.lincolnct.dialog.DefaultDialog
+import com.permissionx.guolilndev.lincolnct.dialog.PermissionDialogInterface
 import java.util.*
 
 /**

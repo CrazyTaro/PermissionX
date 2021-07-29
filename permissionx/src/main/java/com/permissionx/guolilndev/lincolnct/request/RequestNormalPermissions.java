@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.permissionx.guolindev.request;
+package com.permissionx.guolilndev.lincolnct.request;
 
-import com.permissionx.guolindev.PermissionX;
+import com.permissionx.guolilndev.lincolnct.PermissionX;
 
 import java.util.ArrayList;
 import java.util.HashSet;

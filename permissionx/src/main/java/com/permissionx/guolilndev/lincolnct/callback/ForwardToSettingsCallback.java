@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.permissionx.guolindev.callback;
+package com.permissionx.guolilndev.lincolnct.callback;
 
 import androidx.annotation.NonNull;
 
-import com.permissionx.guolindev.request.ForwardScope;
-import com.permissionx.guolindev.request.PermissionBuilder;
+import com.permissionx.guolilndev.lincolnct.request.ForwardScope;
+import com.permissionx.guolilndev.lincolnct.request.PermissionBuilder;
 
 import java.util.List;
 

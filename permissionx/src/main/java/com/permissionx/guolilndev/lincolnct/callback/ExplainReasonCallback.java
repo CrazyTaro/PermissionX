@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.permissionx.guolindev.callback;
+package com.permissionx.guolilndev.lincolnct.callback;
 
 import androidx.annotation.NonNull;
 
-import com.permissionx.guolindev.request.ExplainScope;
-import com.permissionx.guolindev.request.PermissionBuilder;
+import com.permissionx.guolilndev.lincolnct.request.ExplainScope;
+import com.permissionx.guolilndev.lincolnct.request.PermissionBuilder;
 
 import java.util.List;
 
 /**
- * Callback for {@link PermissionBuilder#onExplainRequestReason(ExplainReasonCallbackWithBeforeParam)} method.
+ * Callback for {@link PermissionBuilder#onExplainRequestReason(ExplainReasonCallback)} method.
  *
  * @author guolin
  * @since 2020/6/7
  */
-public interface ExplainReasonCallbackWithBeforeParam {
+public interface ExplainReasonCallback {
 
     /**
      * Called when you should explain why you need these permissions.
@@ -37,9 +37,7 @@ public interface ExplainReasonCallbackWithBeforeParam {
      *          Scope to show rationale dialog.
      * @param deniedList
      *          Permissions that you should explain.
-     * @param beforeRequest
-     *          Indicate it's before or after permission request. Work with {@link PermissionBuilder#explainReasonBeforeRequest()}
      */
-    void onExplainReason(@NonNull ExplainScope scope, @NonNull List<String> deniedList, boolean beforeRequest);
+    void onExplainReason(@NonNull ExplainScope scope, @NonNull List<String> deniedList);
 
 }

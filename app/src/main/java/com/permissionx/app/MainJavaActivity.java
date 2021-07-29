@@ -7,7 +7,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.permissionx.app.databinding.ActivityMainJavaBinding;
-import com.permissionx.guolindev.PermissionX;
+import com.permissionx.guolilndev.lincolnct.PermissionX;
 
 public class MainJavaActivity extends AppCompatActivity {
 

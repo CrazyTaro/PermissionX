@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.permissionx.guolindev.request;
+package com.permissionx.guolilndev.lincolnct.request;
 
 /**
  * Maintain the task chain of permission request process.

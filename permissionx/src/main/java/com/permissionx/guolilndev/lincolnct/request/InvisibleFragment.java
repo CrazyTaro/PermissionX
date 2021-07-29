@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.permissionx.guolindev.request;
+package com.permissionx.guolilndev.lincolnct.request;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -29,7 +29,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.permissionx.guolindev.PermissionX;
+import com.permissionx.guolilndev.lincolnct.PermissionX;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package com.permissionx.guolindev.dialog;
+package com.permissionx.guolilndev.lincolnct.dialog;
 
 /**
  * positive callback for permission dialog

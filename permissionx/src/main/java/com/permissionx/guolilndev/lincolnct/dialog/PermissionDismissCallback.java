@@ -1,4 +1,4 @@
-package com.permissionx.guolindev.dialog;
+package com.permissionx.guolilndev.lincolnct.dialog;
 
 /**
  * dismiss callback for permission dialog
