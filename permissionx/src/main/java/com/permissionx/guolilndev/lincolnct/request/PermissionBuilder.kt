@@ -305,18 +305,7 @@ class PermissionBuilder(
             chainTask.finish()
             return
         }
-        currentDialog = dialog as? Dialog
-        if (!dialog.showDialog()) {
-            dialog.showDialogFragment(fragmentManager, "PermissionXRationaleDialogFragment")
-        }
-        if (dialog is DefaultDialog && dialog.isPermissionLayoutEmpty()) {
-            // No valid permission to show on the dialog.
-            // We call dismiss instead.
-            dialog.dismiss()
-            chainTask.finish()
-        }
-        //we have to call show dialog first,cause the view will be created only in `onCreate` method not in constructor.
-        //otherwise we may get a NullPointerException when calling setPositiveAction or setNegativeAction
+        //config dialog first then show dialog
         dialog.setDialogCancelable(false)
         dialog.setDialogCanceledOnTouchOutside(false)
         dialog.setPositiveAction {
@@ -331,8 +320,15 @@ class PermissionBuilder(
             it.dismissDialog()
             chainTask.finish()
         }
-        dialog.setDismissListener {
-            currentDialog = null
+
+        if (!dialog.showDialog()) {
+            dialog.showDialogFragment(fragmentManager, "PermissionXRationaleDialogFragment")
+        }
+        if (dialog is DefaultDialog && dialog.isPermissionLayoutEmpty()) {
+            // No valid permission to show on the dialog.
+            // We call dismiss instead.
+            dialog.dismiss()
+            chainTask.finish()
         }
     }
 
