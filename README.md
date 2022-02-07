@@ -5,6 +5,8 @@
 
 更新后的项目相比于原项目，会让项目在自定义和个性化方式更加自由。
 
+[![](https://jitpack.io/v/CrazyTaro/PermissionX.svg)](https://jitpack.io/#CrazyTaro/PermissionX)
+
 ## Quick Setup
 
 ```groovy
@@ -15,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.guolindev.permissionx:permissionx:1.5.0'
+    implementation 'com.github.CrazyTaro:PermissionX:Tag'
 }
 ```
 
