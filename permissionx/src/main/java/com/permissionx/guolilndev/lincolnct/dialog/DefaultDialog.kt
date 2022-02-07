@@ -25,9 +25,11 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import com.permissionx.guolilndev.lincolnct.R
-import com.permissionx.guolilndev.lincolnct.databinding.PermissionxDefaultDialogLayoutBinding
-import com.permissionx.guolilndev.lincolnct.databinding.PermissionxPermissionItemBinding
 
 /**
  * Default rationale dialog to show if developers did not implement their own custom rationale dialog.
@@ -35,7 +37,8 @@ import com.permissionx.guolilndev.lincolnct.databinding.PermissionxPermissionIte
  * @author guolin
  * @since 2020/8/27
  */
-class DefaultDialog(context: Context,
+class DefaultDialog(
+    context: Context,
     private val permissions: List<String>,
     private val message: String,
     private val positiveText: String,
@@ -44,12 +47,15 @@ class DefaultDialog(context: Context,
     private val darkColor: Int
 ) : RationaleDialog(context, R.style.PermissionXDefaultDialog) {
 
-    private lateinit var binding: PermissionxDefaultDialogLayoutBinding
+    val messageText by lazy { findViewById<TextView>(R.id.messageText) }
+    val positiveBtn by lazy { findViewById<Button>(R.id.positiveBtn) }
+    val negativeBtn by lazy { findViewById<Button>(R.id.negativeBtn) }
+    val negativeLayout by lazy { findViewById<ViewGroup>(R.id.negativeLayout) }
+    val permissionsLayout by lazy { findViewById<ViewGroup>(R.id.permissionsLayout) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = PermissionxDefaultDialogLayoutBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.permissionx_default_dialog_layout)
         setupText()
         buildPermissionsLayout()
         setupWindow()
@@ -60,7 +66,7 @@ class DefaultDialog(context: Context,
      * @return Positive button instance to continue requesting.
      */
     override fun getPositiveButton(): View {
-        return binding.positiveBtn
+        return positiveBtn
     }
 
     /**
@@ -70,7 +76,7 @@ class DefaultDialog(context: Context,
      */
     override fun getNegativeButton(): View? {
         return negativeText?.let {
-            return binding.negativeBtn
+            return negativeBtn
         }
     }
 
@@ -88,30 +94,30 @@ class DefaultDialog(context: Context,
      * "hello world". We won't add these into permission layout.
      */
     internal fun isPermissionLayoutEmpty(): Boolean {
-        return binding.permissionsLayout.childCount == 0
+        return permissionsLayout.childCount == 0
     }
 
     /**
      * Setup text and text color on the dialog.
      */
     private fun setupText() {
-        binding.messageText.text = message
-        binding.positiveBtn.text = positiveText
+        messageText.text = message
+        positiveBtn.text = positiveText
         if (negativeText != null) {
-            binding.negativeLayout.visibility = View.VISIBLE
-            binding.negativeBtn.text = negativeText
+            negativeLayout.visibility = View.VISIBLE
+            negativeBtn.text = negativeText
         } else {
-            binding.negativeLayout.visibility = View.GONE
+            negativeLayout.visibility = View.GONE
         }
         if (isDarkTheme()) {
             if (darkColor != -1) {
-                binding.positiveBtn.setTextColor(darkColor)
-                binding.negativeBtn.setTextColor(darkColor)
+                positiveBtn.setTextColor(darkColor)
+                negativeBtn.setTextColor(darkColor)
             }
         } else {
             if (lightColor != -1) {
-                binding.positiveBtn.setTextColor(lightColor)
-                binding.negativeBtn.setTextColor(lightColor)
+                positiveBtn.setTextColor(lightColor)
+                negativeBtn.setTextColor(lightColor)
             }
         }
     }
@@ -124,7 +130,7 @@ class DefaultDialog(context: Context,
         val tempSet = HashSet<String>()
         val currentVersion = Build.VERSION.SDK_INT
         for (permission in permissions) {
-            val permissionGroup = when(currentVersion) {
+            val permissionGroup = when (currentVersion) {
                 Build.VERSION_CODES.Q -> permissionMapOnQ[permission]
                 Build.VERSION_CODES.R -> permissionMapOnR[permission]
                 else -> {
@@ -139,39 +145,41 @@ class DefaultDialog(context: Context,
             }
             if ((permission in allSpecialPermissions && !tempSet.contains(permission))
                 || (permissionGroup != null && !tempSet.contains(permissionGroup))) {
-                val itemBinding = PermissionxPermissionItemBinding.inflate(layoutInflater, binding.permissionsLayout, false)
-                when(permission) {
+                val itemBinding = layoutInflater.inflate(R.layout.permissionx_permission_item, permissionsLayout, false)
+                val permissionText = itemBinding.findViewById<TextView>(R.id.permissionText)
+                val permissionIcon = itemBinding.findViewById<ImageView>(R.id.permissionIcon)
+                when (permission) {
                     Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
-                        itemBinding.permissionText.text = context.getString(R.string.permissionx_access_background_location)
-                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_location)
+                        permissionText.text = context.getString(R.string.permissionx_access_background_location)
+                        permissionIcon.setImageResource(R.drawable.permissionx_ic_location)
                     }
                     Manifest.permission.SYSTEM_ALERT_WINDOW -> {
-                        itemBinding.permissionText.text = context.getString(R.string.permissionx_system_alert_window)
-                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_alert)
+                        permissionText.text = context.getString(R.string.permissionx_system_alert_window)
+                        permissionIcon.setImageResource(R.drawable.permissionx_ic_alert)
                     }
                     Manifest.permission.WRITE_SETTINGS -> {
-                        itemBinding.permissionText.text = context.getString(R.string.permissionx_write_settings)
-                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_setting)
+                        permissionText.text = context.getString(R.string.permissionx_write_settings)
+                        permissionIcon.setImageResource(R.drawable.permissionx_ic_setting)
                     }
                     Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
-                        itemBinding.permissionText.text = context.getString(R.string.permissionx_manage_external_storage)
-                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_storage)
+                        permissionText.text = context.getString(R.string.permissionx_manage_external_storage)
+                        permissionIcon.setImageResource(R.drawable.permissionx_ic_storage)
                     }
                     else -> {
-                        itemBinding.permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).labelRes)
-                        itemBinding.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).icon)
+                        permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).labelRes)
+                        permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).icon)
                     }
                 }
                 if (isDarkTheme()) {
                     if (darkColor != -1) {
-                        itemBinding.permissionIcon.setColorFilter(darkColor, PorterDuff.Mode.SRC_ATOP)
+                        permissionIcon.setColorFilter(darkColor, PorterDuff.Mode.SRC_ATOP)
                     }
                 } else {
                     if (lightColor != -1) {
-                        itemBinding.permissionIcon.setColorFilter(lightColor, PorterDuff.Mode.SRC_ATOP)
+                        permissionIcon.setColorFilter(lightColor, PorterDuff.Mode.SRC_ATOP)
                     }
                 }
-                binding.permissionsLayout.addView(itemBinding.root)
+                permissionsLayout.addView(itemBinding)
                 tempSet.add(permissionGroup ?: permission)
             }
         }

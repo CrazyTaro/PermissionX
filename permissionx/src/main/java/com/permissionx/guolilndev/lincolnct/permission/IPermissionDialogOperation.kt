@@ -1,11 +1,60 @@
 package com.permissionx.guolilndev.lincolnct.permission
 
 /**
- * 权限相关的处理操作
+ * 权限对话框的配置操作
  */
-interface IPermissionOperation {
-    fun setExplainDialog(dialog: PermissionExplainDialogInterface): IPermissionOperation
-    fun setExplainDialog(type: PermissionDialogType, dialog: PermissionExplainDialogInterface): IPermissionOperation
+interface IPermissionConfigDialogOperation {
+    //region 快捷的参数配置
+    /**
+     * 设置指定类型对话框的确认文本
+     */
+    fun setExplainDialogPositiveText(type: PermissionDialogType, text: String): IPermissionConfigDialogOperation {
+        getExplainDialogConfig(type)?.positiveText = text
+        return this
+    }
+    /**
+     * 设置指定类型对话框的取消文本
+     */
+    fun setExplainDialogNegativeText(type: PermissionDialogType, text: String): IPermissionConfigDialogOperation {
+        getExplainDialogConfig(type)?.negativeText = text
+        return this
+    }
+    /**
+     * 设置指定类型对话框的消息内容
+     */
+    fun setExplainDialogMessageText(type: PermissionDialogType, text: String): IPermissionConfigDialogOperation {
+        getExplainDialogConfig(type)?.message = text
+        return this
+    }
+    //endregion
+
+    //region 请求权限提示信息的参数配置及兼容原有接口方法
+    /**
+     * 设置默认的请求权限解释时对话框的接口，等同于 [setExplainDialog] 并指定对话框类型是 [PermissionDialogType.EXPLAIN_REQUEST_REASON]
+     */
+    fun setExplainDialog(dialog: PermissionExplainDialogInterface): IPermissionConfigDialogOperation {
+        return setExplainDialog(PermissionDialogType.EXPLAIN_REQUEST_REASON, dialog)
+    }
+    //endregion
+
+    //region 权限接口代理处理，完全自主地处理对话框参数
+    /**
+     * 设置权限对话框代理对象
+     */
+    fun setExplainDialogDelegate(delegate: IPermissionDialogDelegate): IPermissionConfigDialogOperation
+    /**
+     * 获取权限对话框代理对象
+     */
+    fun getExplainDialogDelegate(): IPermissionDialogDelegate?
+    //endregion
+    /**
+     * 设置权限提示对话框的接口实现，需要指定对话框类型
+     * @param type [PermissionDialogType]，包含三种对话框
+     * - [PermissionDialogType.EXPLAIN_REQUEST_REASON]
+     * - [PermissionDialogType.EXPLAIN_DENIED_TIPS]
+     * - [PermissionDialogType.EXPLAIN_FORWARD_SETTING_TIPS]
+     */
+    fun setExplainDialog(type: PermissionDialogType, dialog: PermissionExplainDialogInterface): IPermissionConfigDialogOperation
     /**
      * 设置授权权限的分组，用于优化显示多个权限的分类；
      * - 在配置权限后，将尝试根据该权限去查找对应的权限组，如果能查找到，则更新该权限组的说明；
@@ -14,41 +63,85 @@ interface IPermissionOperation {
      * @param permission 某个具体的权限，注意这里是具体的某个权限，而不是权限组本身
      * @param tips 该权限所在的项目组的说明
      */
-    fun setPermissionGroupExplainTips(permission: String, tips: String): IPermissionOperation
-    fun setShowPermissionGroupExplainTipsEnabled(show: Boolean): IPermissionOperation
-    fun setShowPermissionGroupExplainTipsEnabled(type: PermissionDialogType, show: Boolean): IPermissionOperation
-    fun setExplainDialogConfig(type: PermissionDialogType, dialogConfig: IPermissionDialogConfig): IPermissionOperation
-}
+    fun setPermissionGroupExplainTips(permission: String, tips: String): IPermissionConfigDialogOperation
+    /**
+     * 设置
+     */
+    fun setShowPermissionGroupExplainTipsEnabled(show: Boolean): IPermissionConfigDialogOperation
+    /**
+     * 指定对话框类型，设置是否显示权限分组的提示信息。如果需要显示，则会在该对话框的内容下再另外显示出当前的权限分组及其提示信息，如
+     *
+     * ```
+     * 以下权限是应用运行所必须的，请授权
+     * ● 日历
+     * ```
+     *
+     * 如果提示信息是相同的文本内容，将会被过滤只显示一条信息
+     *
+     * @param type 权限对话框类型
+     * @param show 是否需要显示权限分组提示信息
+     */
+    fun setShowPermissionGroupExplainTipsEnabled(type: PermissionDialogType, show: Boolean): IPermissionConfigDialogOperation
+    /**
+     * 设置指定对话框类型的对话框配置信息
+     * @param type [PermissionDialogType]
+     * @param dialogConfig [IPermissionDialogConfig] 权限对话框配置
+     */
+    fun setExplainDialogConfig(type: PermissionDialogType, dialogConfig: IPermissionDialogConfig): IPermissionConfigDialogOperation
 
-interface IPermissionConfigOperation : IPermissionOperation {
+    /**
+     * 获取当前权限的相应类型的对话框
+     * @param type [PermissionDialogType]，权限对话框类型
+     */
     fun getPermissionExplainDialog(type: PermissionDialogType): PermissionExplainDialogInterface?
+    /**
+     * 获取当前权限的相应类型的对话框，并确认该类型对话框存在，如不存在则抛出异常
+     * @param type [PermissionDialogType]，权限对话框类型
+     */
     fun getPermissionExplainDialogEnsureExist(type: PermissionDialogType): PermissionExplainDialogInterface {
         return getPermissionExplainDialog(type)!!
     }
 
+    /**
+     * 是否显示指定对话框类型的权限分组提示信息
+     * @param type [PermissionDialogType]，权限对话框类型
+     */
     fun isShowPermissionGroupExplainTipsEnabled(type: PermissionDialogType): Boolean
-
+    /**
+     * 获取权限对话框配置
+     * @param type [PermissionDialogType]，权限对话框类型
+     */
     fun getExplainDialogConfig(type: PermissionDialogType): IPermissionDialogConfig?
+    /**
+     * 获取权限对话框配置，并确认存在，如不存在则抛出异常
+     */
     fun getExplainDialogConfigEnsureExist(type: PermissionDialogType): IPermissionDialogConfig {
         return getExplainDialogConfig(type)!!
     }
 
-    fun setExplainDialogPositiveText(type: PermissionDialogType, text: String): IPermissionConfigOperation {
-        getExplainDialogConfig(type)?.positiveText = text
-        return this
-    }
-
-    fun setExplainDialogNegativeText(type: PermissionDialogType, text: String): IPermissionConfigOperation {
-        getExplainDialogConfig(type)?.negativeText = text
-        return this
-    }
-
-    fun setExplainDialogMessageText(type: PermissionDialogType, text: String): IPermissionConfigOperation {
-        getExplainDialogConfig(type)?.message = text
-        return this
+    /**
+     * 获取指定的权限分组信息的提示
+     */
+    fun getPermissionGroupExplainTips(permission: String): String?
+    /**
+     * 返回当前的权限组说明，这里的参数来自默认的权限组定义，也可以通过 [setPermissionGroupExplainTips] 配置权限组的说明信息;
+     */
+    fun generateDefaultPermissionGroupExplainTips(permissions: List<String>): List<String> {
+        return permissions
+            .mapNotNull {
+                val group = PermissionRequestBuilder.getPermissionGroupOrReturnSelf(it)
+                getPermissionGroupExplainTips(group)
+            }
+            .distinct()
     }
 }
 
+/**
+ * 权限请求构建对象的接口
+ */
 interface IPermissionRequestBuilder {
-    fun getPermissionDialogConfig(): IPermissionConfigOperation
+    /**
+     * 获取权限对话框配置参数
+     */
+    fun getPermissionDialogConfig(): IPermissionConfigDialogOperation
 }
