@@ -17,8 +17,8 @@
 package com.permissionx.guolilndev.lincolnct
 
 import android.os.Build
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentActivity
 import com.permissionx.guolilndev.lincolnct.dialog.allSpecialPermissions
 import com.permissionx.guolilndev.lincolnct.request.PermissionBuilder
 import com.permissionx.guolilndev.lincolnct.request.RequestBackgroundLocationPermission

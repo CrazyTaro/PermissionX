@@ -18,10 +18,10 @@ package com.permissionx.guolilndev.lincolnct;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 /**
  * An open source Android library that makes handling runtime permissions extremely easy.

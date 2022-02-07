@@ -23,11 +23,10 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import com.permissionx.guolilndev.lincolnct.PermissionX;
 
@@ -397,6 +396,7 @@ public class InvisibleFragment extends Fragment {
     /**
      * On some phones, PermissionBuilder and ChainTask may become null under unpredictable occasions such as GC.
      * They should not be null at this time, so we can do nothing in this case.
+     *
      * @return PermissionBuilder and ChainTask are still alive or not. If not, we should not do any further logic.
      */
     private boolean checkForGC() {

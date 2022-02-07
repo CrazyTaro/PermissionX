@@ -16,7 +16,7 @@
 
 package com.permissionx.guolilndev.lincolnct.callback;
 
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import com.permissionx.guolilndev.lincolnct.request.ForwardScope;
 import com.permissionx.guolilndev.lincolnct.request.PermissionBuilder;
@@ -33,10 +33,9 @@ public interface ForwardToSettingsCallback {
 
     /**
      * Called when you should tell user to allow these permissions in settings.
-     * @param scope
-     *          Scope to show rationale dialog.
-     * @param deniedList
-     *          Permissions that should allow in settings.
+     *
+     * @param scope      Scope to show rationale dialog.
+     * @param deniedList Permissions that should allow in settings.
      */
     void onForwardToSettings(@NonNull ForwardScope scope, @NonNull List<String> deniedList);
 

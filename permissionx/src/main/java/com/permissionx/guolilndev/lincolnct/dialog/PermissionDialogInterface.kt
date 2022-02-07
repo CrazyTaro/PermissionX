@@ -1,6 +1,7 @@
 package com.permissionx.guolilndev.lincolnct.dialog
 
-import androidx.fragment.app.FragmentManager
+import android.support.v4.app.FragmentManager
+
 
 /**
  * permission dialog interface, works like a dialog. this interface can be implemented by dialog or dialog fragment,

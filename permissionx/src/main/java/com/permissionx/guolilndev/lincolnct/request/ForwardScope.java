@@ -16,8 +16,10 @@
 
 package com.permissionx.guolilndev.lincolnct.request;
 
-import androidx.annotation.NonNull;
 
+import android.support.annotation.NonNull;
+
+import com.permissionx.guolilndev.lincolnct.dialog.PermissionDialogInterface;
 import com.permissionx.guolilndev.lincolnct.dialog.RationaleDialog;
 import com.permissionx.guolilndev.lincolnct.dialog.RationaleDialogFragment;
 
@@ -25,10 +27,11 @@ import java.util.List;
 
 /**
  * Provide specific scopes for {@link com.permissionx.guolilndev.lincolnct.callback.ForwardToSettingsCallback} to give it specific functions to call.
+ *
  * @author guolin
  * @since 2020/3/18
  */
-public class ForwardScope {
+public class ForwardScope implements IScope {
 
     private PermissionBuilder pb;
 
@@ -41,14 +44,11 @@ public class ForwardScope {
 
     /**
      * Show a rationale dialog to tell user to allow these permissions in settings.
-     * @param permissions
-     *          Permissions that to request.
-     * @param message
-     *          Message that show to user.
-     * @param positiveText
-     *          Text on the positive button. When user click, PermissionX will forward to settings page of your app.
-     * @param negativeText
-     *          Text on the negative button. When user click, PermissionX will finish request.
+     *
+     * @param permissions  Permissions that to request.
+     * @param message      Message that show to user.
+     * @param positiveText Text on the positive button. When user click, PermissionX will forward to settings page of your app.
+     * @param negativeText Text on the negative button. When user click, PermissionX will finish request.
      */
     public void showForwardToSettingsDialog(List<String> permissions, String message, String positiveText, String negativeText) {
         pb.showHandlePermissionDialog(chainTask, false, permissions, message, positiveText, negativeText);
@@ -56,12 +56,10 @@ public class ForwardScope {
 
     /**
      * Show a rationale dialog to tell user to allow these permissions in settings.
-     * @param permissions
-     *          Permissions that to request.
-     * @param message
-     *          Message that show to user.
-     * @param positiveText
-     *          Text on the positive button. When user click, PermissionX will forward to settings page of your app.
+     *
+     * @param permissions  Permissions that to request.
+     * @param message      Message that show to user.
+     * @param positiveText Text on the positive button. When user click, PermissionX will forward to settings page of your app.
      */
     public void showForwardToSettingsDialog(List<String> permissions, String message, String positiveText) {
         showForwardToSettingsDialog(permissions, message, positiveText, null);
@@ -69,8 +67,8 @@ public class ForwardScope {
 
     /**
      * Show a rationale dialog to tell user to allow these permissions in settings.
-     * @param dialog
-     *          Dialog to explain to user why these permissions are necessary.
+     *
+     * @param dialog Dialog to explain to user why these permissions are necessary.
      */
     public void showForwardToSettingsDialog(@NonNull RationaleDialog dialog) {
         pb.showHandlePermissionDialog(chainTask, false, dialog);
@@ -78,10 +76,15 @@ public class ForwardScope {
 
     /**
      * Show a rationale dialog to tell user to allow these permissions in settings.
-     * @param dialogFragment
-     *          DialogFragment to explain to user why these permissions are necessary.
+     *
+     * @param dialogFragment DialogFragment to explain to user why these permissions are necessary.
      */
     public void showForwardToSettingsDialog(@NonNull RationaleDialogFragment dialogFragment) {
         pb.showHandlePermissionDialog(chainTask, false, dialogFragment);
+    }
+
+    @Override
+    public void showHandlePermissionDialog(@NonNull PermissionDialogInterface dialog) {
+        pb.showHandlePermissionDialog(chainTask, false, dialog);
     }
 }

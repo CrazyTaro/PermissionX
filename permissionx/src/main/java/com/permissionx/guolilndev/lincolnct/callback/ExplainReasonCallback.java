@@ -16,7 +16,7 @@
 
 package com.permissionx.guolilndev.lincolnct.callback;
 
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import com.permissionx.guolilndev.lincolnct.request.ExplainScope;
 import com.permissionx.guolilndev.lincolnct.request.PermissionBuilder;
@@ -33,10 +33,9 @@ public interface ExplainReasonCallback {
 
     /**
      * Called when you should explain why you need these permissions.
-     * @param scope
-     *          Scope to show rationale dialog.
-     * @param deniedList
-     *          Permissions that you should explain.
+     *
+     * @param scope      Scope to show rationale dialog.
+     * @param deniedList Permissions that you should explain.
      */
     void onExplainReason(@NonNull ExplainScope scope, @NonNull List<String> deniedList);
 

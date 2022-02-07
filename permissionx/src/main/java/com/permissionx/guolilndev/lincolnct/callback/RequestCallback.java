@@ -16,7 +16,7 @@
 
 package com.permissionx.guolilndev.lincolnct.callback;
 
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import com.permissionx.guolilndev.lincolnct.request.PermissionBuilder;
 
