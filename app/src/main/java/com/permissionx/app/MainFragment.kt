@@ -1,6 +1,7 @@
 package com.permissionx.app
 
 import android.Manifest
+import android.app.AlertDialog
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import com.permissionx.guolilndev.lincolnct.permission.AbsPermissionExplainDialog
 import com.permissionx.guolilndev.lincolnct.permission.PermissionDialogRequestGlobalConfig
 import com.permissionx.guolilndev.lincolnct.permission.PermissionDialogType
 import com.permissionx.guolilndev.lincolnct.permission.PermissionRequestBuilder
@@ -89,11 +91,47 @@ class MainFragment : Fragment() {
 
         PermissionRequestBuilder.init(
             PermissionDialogRequestGlobalConfig().apply {
+                //配置全局的dialog样式，通过接口的方式，允许实际的dialog是使用任何的方式实现
+                //默认的 PermissionDialogRequestGlobalConfig 已经有实现的 dialog
+                setExplainDialog(PermissionDialogType.EXPLAIN_REQUEST_REASON, object :
+                    AbsPermissionExplainDialog() {
+                    override fun showDialog(): Boolean {
+                        val dialogInterface = this
+                        dialog = AlertDialog.Builder(config.context)
+                            .apply {
+                                if (config.title.isNotEmpty()) {
+                                    setTitle(config.title)
+                                }
+                                setMessage(generateDisplayMessage(config))
+                                setCancelable(cancelable)
+                                if (config.positiveText.isNotEmpty()) {
+                                    setPositiveButton(config.positiveText) { dialog, which ->
+                                        positiveCallback?.onPositiveAction(dialogInterface)
+                                    }
+                                }
+                                if (config.negativeText.isNotEmpty()) {
+                                    setNegativeButton(config.negativeText) { dialog, which ->
+                                        negativeCallback?.onNegativeAction(dialogInterface)
+                                    }
+                                }
+                            }
+                            .create()
+                        if (dismissCallback != null) {
+                            dialog.setOnDismissListener {
+                                dismissCallback?.onDismissAction(dialogInterface)
+                            }
+                        }
+                        dialog.show()
+                        return true
+                    }
+                })
+                //设置默认的对话框类型的文本内容/确认文本/取消文本
                 setExplainDialogMessageText(PermissionDialogType.EXPLAIN_REQUEST_REASON, "这是默认的请求文本")
                 setExplainDialogPositiveText(PermissionDialogType.EXPLAIN_FORWARD_SETTING_TIPS, "这是默认的确认文本")
                 setExplainDialogNegativeText(PermissionDialogType.EXPLAIN_DENIED_TIPS, "这是默认的取消文本")
-                setShowPermissionGroupExplainTipsEnabled(PermissionDialogType.EXPLAIN_FORWARD_SETTING_TIPS, true)
                 setExplainDialogMessageText(PermissionDialogType.EXPLAIN_FORWARD_SETTING_TIPS, "默认跳转设置时是列出权限分组的，其它的没有")
+                //设置默认的对话框类型是否显示出权限分组的提示信息
+                setShowPermissionGroupExplainTipsEnabled(PermissionDialogType.EXPLAIN_FORWARD_SETTING_TIPS, true)
             }
         )
     }
