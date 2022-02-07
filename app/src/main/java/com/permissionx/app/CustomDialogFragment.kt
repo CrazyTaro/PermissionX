@@ -8,23 +8,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.permissionx.app.databinding.CustomDialogLayoutBinding
-import com.permissionx.app.databinding.PermissionsItemBinding
+import android.widget.Button
+import android.widget.TextView
 import com.permissionx.guolilndev.lincolnct.dialog.RationaleDialogFragment
 
 @TargetApi(30)
 class CustomDialogFragment() : RationaleDialogFragment() {
 
-    var mMessage: String = ""
+    val messageText by lazy { view!!.findViewById<TextView>(R.id.messageText) }
+    val positiveBtn by lazy { view!!.findViewById<Button>(R.id.positiveBtn) }
+    val negativeBtn by lazy { view!!.findViewById<Button>(R.id.negativeBtn) }
+    val permissionsLayout by lazy { view!!.findViewById<ViewGroup>(R.id.permissionsLayout) }
 
+    var mMessage: String = ""
     var mPermissions: List<String> = emptyList()
 
-    constructor(message: String, permissions: List<String>): this() {
+    constructor(message: String, permissions: List<String>) : this() {
         mMessage = message
         mPermissions = permissions
     }
 
-    private val permissionMap = mapOf(Manifest.permission.READ_CALENDAR to Manifest.permission_group.CALENDAR,
+    private val permissionMap = mapOf(
+        Manifest.permission.READ_CALENDAR to Manifest.permission_group.CALENDAR,
         Manifest.permission.WRITE_CALENDAR to Manifest.permission_group.CALENDAR,
         Manifest.permission.READ_CALL_LOG to Manifest.permission_group.CALL_LOG,
         Manifest.permission.WRITE_CALL_LOG to Manifest.permission_group.CALL_LOG,
@@ -58,33 +63,23 @@ class CustomDialogFragment() : RationaleDialogFragment() {
 
     private val groupSet = HashSet<String>()
 
-    private var _binding: CustomDialogLayoutBinding? = null
-
-    private val binding get() = _binding!!
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        _binding = CustomDialogLayoutBinding.inflate(inflater, container, false)
-        return binding.root
+        return layoutInflater.inflate(R.layout.custom_dialog_layout, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.messageText.text = mMessage
+        messageText.text = mMessage
         buildPermissionsLayout()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     override fun getNegativeButton(): View {
-        return binding.negativeBtn
+        return negativeBtn
     }
 
     override fun getPositiveButton(): View {
-        return binding.positiveBtn
+        return positiveBtn
     }
 
     override fun getPermissionsToRequest(): List<String> {
@@ -95,11 +90,12 @@ class CustomDialogFragment() : RationaleDialogFragment() {
         for (permission in mPermissions) {
             val permissionGroup = permissionMap[permission]
             if (permissionGroup != null && !groupSet.contains(permissionGroup)) {
-                val itemBinding = PermissionsItemBinding.inflate(layoutInflater, binding.permissionsLayout, false)
-                itemBinding.root.text = context?.let {
-                    it.packageManager.getPermissionGroupInfo(permissionGroup, 0).loadLabel(it.packageManager)
+                val itemBinding = layoutInflater.inflate(R.layout.permissions_item, permissionsLayout, false) as TextView
+                itemBinding.text = context?.let {
+                    it.packageManager.getPermissionGroupInfo(permissionGroup, 0)
+                        .loadLabel(it.packageManager)
                 }
-                binding.permissionsLayout.addView(itemBinding.root)
+                permissionsLayout.addView(itemBinding)
                 groupSet.add(permissionGroup)
             }
         }
