@@ -42,8 +42,9 @@ open class PermissionExplainDialogConfig(
     override var attach: Any? = null,
 ) : IPermissionDialogConfig {
     override fun clone(): PermissionExplainDialogConfig {
+        val parent = this
         return PermissionExplainDialogConfig().apply {
-            applyConfig(this)
+            applyConfig(parent)
         }
     }
 }
