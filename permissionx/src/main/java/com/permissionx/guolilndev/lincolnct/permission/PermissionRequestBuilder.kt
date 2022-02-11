@@ -134,8 +134,13 @@ class PermissionRequestBuilder private constructor() : IPermissionRequestBuilder
                     onExplainRequestReason { scope, deniedList, beforeRequest ->
                         if (beforeRequest) {
                             processExplainDialog(scope, deniedList, activity, PermissionDialogType.EXPLAIN_REQUEST_REASON)
-                        } else if (!beforeRequest && deniedReason.isNotEmpty()) {
-                            processExplainDialog(scope, deniedList, activity, PermissionDialogType.EXPLAIN_DENIED_TIPS)
+                        } else if (!beforeRequest) {
+                            if (deniedReason.isNotEmpty()) {
+                                processExplainDialog(scope, deniedList, activity, PermissionDialogType.EXPLAIN_DENIED_TIPS)
+                            } else {
+                                //2022/2/10 Lincoln-如果是拒绝的情况下，又不需要显示出dialog的话，则标识dialog没有被调用
+                                showDialogCalled = false
+                            }
                         }
                     }
                 } else if (deniedReason.isNotEmpty()) {
@@ -187,7 +192,7 @@ class PermissionRequestBuilder private constructor() : IPermissionRequestBuilder
     }
 
     companion object {
-        private var globalConfig: PermissionDialogRequestGlobalConfig = PermissionDialogRequestGlobalConfig()
+        private var globalConfig: IPermissionConfigDialogOperation = PermissionDialogRequestGlobalConfig()
         private val permissionGroup: Map<String, String> = permissionMapOnR
 
         @JvmStatic
@@ -205,7 +210,7 @@ class PermissionRequestBuilder private constructor() : IPermissionRequestBuilder
         }
 
         @JvmStatic
-        fun init(globalConfig: PermissionDialogRequestGlobalConfig) {
+        fun init(globalConfig: IPermissionConfigDialogOperation) {
             Companion.globalConfig = globalConfig
         }
 

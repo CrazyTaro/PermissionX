@@ -17,10 +17,6 @@ class PermissionDialogRequestGlobalConfig : IPermissionConfigDialogOperation {
         return this
     }
 
-    override fun setShowPermissionGroupExplainTipsEnabled(show: Boolean): PermissionDialogRequestGlobalConfig {
-        return setShowPermissionGroupExplainTipsEnabled(PermissionDialogType.EXPLAIN_REQUEST_REASON, show)
-    }
-
     override fun setShowPermissionGroupExplainTipsEnabled(type: PermissionDialogType, show: Boolean): PermissionDialogRequestGlobalConfig {
         this._explainDialogs[type]?.showGroupTips = show
         return this
@@ -36,22 +32,13 @@ class PermissionDialogRequestGlobalConfig : IPermissionConfigDialogOperation {
         return this
     }
 
-    override fun setExplainDialogDelegate(delegate: IPermissionDialogDelegate): IPermissionConfigDialogOperation {
+    override fun setExplainDialogDelegate(delegate: IPermissionDialogDelegate): PermissionDialogRequestGlobalConfig {
         _permissionDialogDelegate = delegate
         return this
     }
 
     override fun getExplainDialogDelegate(): IPermissionDialogDelegate? {
         return _permissionDialogDelegate
-    }
-
-    internal fun applyConfig(config: PermissionDialogRequestGlobalConfig): PermissionDialogRequestGlobalConfig {
-        this._permissionGroupTips.putAll(config._permissionGroupTips)
-        config._explainDialogs.forEach { entry ->
-            //这里是需要复制出来的，否则的话 dialogHolder 的参数配置会使用到默认的配置，因为对象引用一致
-            this._explainDialogs[entry.key] = entry.value.clone()
-        }
-        return this
     }
 
     override fun getPermissionExplainDialog(type: PermissionDialogType): PermissionExplainDialogInterface? {
@@ -68,6 +55,17 @@ class PermissionDialogRequestGlobalConfig : IPermissionConfigDialogOperation {
 
     override fun getPermissionGroupExplainTips(permission: String): String? {
         return this._permissionGroupTips[permission]
+    }
+
+    override fun applyConfig(config: IPermissionConfigDialogOperation): PermissionDialogRequestGlobalConfig {
+        if (config is PermissionDialogRequestGlobalConfig) {
+            this._permissionGroupTips.putAll(config._permissionGroupTips)
+            config._explainDialogs.forEach { entry ->
+                //这里是需要复制出来的，否则的话 dialogHolder 的参数配置会使用到默认的配置，因为对象引用一致
+                this._explainDialogs[entry.key] = entry.value.clone()
+            }
+        }
+        return this
     }
 }
 

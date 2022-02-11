@@ -28,12 +28,22 @@ interface IPermissionConfigDialogOperation {
     }
     //endregion
 
-    //region 请求权限提示信息的参数配置及兼容原有接口方法
+    //region 全局配置，对所有对话框类型都生效的方法
     /**
-     * 设置默认的请求权限解释时对话框的接口，等同于 [setExplainDialog] 并指定对话框类型是 [PermissionDialogType.EXPLAIN_REQUEST_REASON]
+     * 设置默认的对话框的接口，等同于 [setExplainDialog] 并配置所有对话框类型均使用此接口
      */
     fun setExplainDialog(dialog: PermissionExplainDialogInterface): IPermissionConfigDialogOperation {
-        return setExplainDialog(PermissionDialogType.EXPLAIN_REQUEST_REASON, dialog)
+        PermissionDialogType.values()
+            .forEach { setExplainDialog(it, dialog) }
+        return this
+    }
+    /**
+     * 设置全局的对话框类型是否都需要显示出权限分组的提示信息，详见 [setShowPermissionGroupExplainTipsEnabled]
+     */
+    fun setShowPermissionGroupExplainTipsEnabled(show: Boolean): IPermissionConfigDialogOperation {
+        PermissionDialogType.values()
+            .forEach { setShowPermissionGroupExplainTipsEnabled(it, show) }
+        return this
     }
     //endregion
 
@@ -64,10 +74,6 @@ interface IPermissionConfigDialogOperation {
      * @param tips 该权限所在的项目组的说明
      */
     fun setPermissionGroupExplainTips(permission: String, tips: String): IPermissionConfigDialogOperation
-    /**
-     * 设置
-     */
-    fun setShowPermissionGroupExplainTipsEnabled(show: Boolean): IPermissionConfigDialogOperation
     /**
      * 指定对话框类型，设置是否显示权限分组的提示信息。如果需要显示，则会在该对话框的内容下再另外显示出当前的权限分组及其提示信息，如
      *
@@ -134,6 +140,11 @@ interface IPermissionConfigDialogOperation {
             }
             .distinct()
     }
+
+    /**
+     * 将当前的配置应用新的配置对象
+     */
+    fun applyConfig(config: IPermissionConfigDialogOperation): IPermissionConfigDialogOperation
 }
 
 /**
