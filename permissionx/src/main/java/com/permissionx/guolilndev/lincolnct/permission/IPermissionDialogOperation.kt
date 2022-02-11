@@ -1,5 +1,8 @@
 package com.permissionx.guolilndev.lincolnct.permission
 
+import android.content.Context
+import android.content.pm.PackageManager
+
 /**
  * 权限对话框的配置操作
  */
@@ -132,11 +135,20 @@ interface IPermissionConfigDialogOperation {
     /**
      * 返回当前的权限组说明，这里的参数来自默认的权限组定义，也可以通过 [setPermissionGroupExplainTips] 配置权限组的说明信息;
      */
-    fun generateDefaultPermissionGroupExplainTips(permissions: List<String>): List<String> {
+    fun generateDefaultPermissionGroupExplainTips(context: Context, permissions: List<String>): List<String> {
         return permissions
             .mapNotNull {
                 val group = PermissionRequestBuilder.getPermissionGroupOrReturnSelf(it)
-                getPermissionGroupExplainTips(group)
+                var explainTip = getPermissionGroupExplainTips(group)
+                if (explainTip == null) {
+                    try {
+                        explainTip = context.packageManager.getPermissionGroupInfo(group, 0)
+                            .loadLabel(context.packageManager)
+                            .toString()
+                    } catch (ignore: PackageManager.NameNotFoundException) {
+                    }
+                }
+                explainTip
             }
             .distinct()
     }
@@ -154,5 +166,49 @@ interface IPermissionRequestBuilder {
     /**
      * 获取权限对话框配置参数
      */
-    fun getPermissionDialogConfig(): IPermissionConfigDialogOperation
+    fun beginDialogConfigTransaction(): IPermissionDialogTransaction
+}
+
+/**
+ * 用于弹窗配置与权限请求类的转换
+ */
+interface IPermissionDialogTransaction : IPermissionConfigDialogOperation {
+    override fun setExplainDialogPositiveText(type: PermissionDialogType, text: String): IPermissionDialogTransaction {
+        super.setExplainDialogPositiveText(type, text)
+        return this
+    }
+
+    override fun setExplainDialogNegativeText(type: PermissionDialogType, text: String): IPermissionDialogTransaction {
+        super.setExplainDialogNegativeText(type, text)
+        return this
+    }
+
+    override fun setExplainDialogMessageText(type: PermissionDialogType, text: String): IPermissionDialogTransaction {
+        super.setExplainDialogMessageText(type, text)
+        return this
+    }
+
+    override fun setExplainDialog(dialog: PermissionExplainDialogInterface): IPermissionDialogTransaction {
+        super.setExplainDialog(dialog)
+        return this
+    }
+
+    override fun setShowPermissionGroupExplainTipsEnabled(show: Boolean): IPermissionDialogTransaction {
+        super.setShowPermissionGroupExplainTipsEnabled(show)
+        return this
+    }
+
+    override fun setExplainDialogDelegate(delegate: IPermissionDialogDelegate): IPermissionDialogTransaction
+
+    override fun setExplainDialog(type: PermissionDialogType, dialog: PermissionExplainDialogInterface): IPermissionDialogTransaction
+
+    override fun setPermissionGroupExplainTips(permission: String, tips: String): IPermissionDialogTransaction
+
+    override fun setShowPermissionGroupExplainTipsEnabled(type: PermissionDialogType, show: Boolean): IPermissionDialogTransaction
+
+    override fun setExplainDialogConfig(type: PermissionDialogType, dialogConfig: IPermissionDialogConfig): IPermissionDialogTransaction
+
+    override fun applyConfig(config: IPermissionConfigDialogOperation): IPermissionDialogTransaction
+
+    fun endDialogConfigTransaction(): PermissionRequestBuilder
 }

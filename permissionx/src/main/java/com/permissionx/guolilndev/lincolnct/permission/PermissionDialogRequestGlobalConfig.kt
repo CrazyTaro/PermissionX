@@ -1,7 +1,7 @@
 package com.permissionx.guolilndev.lincolnct.permission
 
-class PermissionDialogRequestGlobalConfig : IPermissionConfigDialogOperation {
-    private val _permissionGroupTips: MutableMap<String, String> = mutableMapOf()
+open class PermissionDialogRequestGlobalConfig : IPermissionConfigDialogOperation {
+    private val _permissionGroupTips = mutableMapOf<String, String>()
     private var _permissionDialogDelegate: IPermissionDialogDelegate? = null
     private var _explainDialogs = mutableMapOf(
         PermissionDialogType.EXPLAIN_REQUEST_REASON to DialogHolder(PermissionExplainDialog(), false, PermissionExplainDialogConfig()),
@@ -12,27 +12,27 @@ class PermissionDialogRequestGlobalConfig : IPermissionConfigDialogOperation {
     internal val permissionGroupTips: Map<String, String>
         get() = _permissionGroupTips
 
-    override fun setPermissionGroupExplainTips(permission: String, tips: String): PermissionDialogRequestGlobalConfig {
+    override fun setPermissionGroupExplainTips(permission: String, tips: String): IPermissionConfigDialogOperation {
         this._permissionGroupTips[PermissionRequestBuilder.getPermissionGroupOrReturnSelf(permission)] = tips
         return this
     }
 
-    override fun setShowPermissionGroupExplainTipsEnabled(type: PermissionDialogType, show: Boolean): PermissionDialogRequestGlobalConfig {
+    override fun setShowPermissionGroupExplainTipsEnabled(type: PermissionDialogType, show: Boolean): IPermissionConfigDialogOperation {
         this._explainDialogs[type]?.showGroupTips = show
         return this
     }
 
-    override fun setExplainDialogConfig(type: PermissionDialogType, dialogConfig: IPermissionDialogConfig): PermissionDialogRequestGlobalConfig {
+    override fun setExplainDialogConfig(type: PermissionDialogType, dialogConfig: IPermissionDialogConfig): IPermissionConfigDialogOperation {
         this._explainDialogs[type]?.dialogConfig = dialogConfig
         return this
     }
 
-    override fun setExplainDialog(type: PermissionDialogType, dialog: PermissionExplainDialogInterface): PermissionDialogRequestGlobalConfig {
+    override fun setExplainDialog(type: PermissionDialogType, dialog: PermissionExplainDialogInterface): IPermissionConfigDialogOperation {
         this._explainDialogs[type]?.dialog = dialog
         return this
     }
 
-    override fun setExplainDialogDelegate(delegate: IPermissionDialogDelegate): PermissionDialogRequestGlobalConfig {
+    override fun setExplainDialogDelegate(delegate: IPermissionDialogDelegate): IPermissionConfigDialogOperation {
         _permissionDialogDelegate = delegate
         return this
     }
@@ -57,7 +57,7 @@ class PermissionDialogRequestGlobalConfig : IPermissionConfigDialogOperation {
         return this._permissionGroupTips[permission]
     }
 
-    override fun applyConfig(config: IPermissionConfigDialogOperation): PermissionDialogRequestGlobalConfig {
+    override fun applyConfig(config: IPermissionConfigDialogOperation): IPermissionConfigDialogOperation {
         if (config is PermissionDialogRequestGlobalConfig) {
             this._permissionGroupTips.putAll(config._permissionGroupTips)
             config._explainDialogs.forEach { entry ->

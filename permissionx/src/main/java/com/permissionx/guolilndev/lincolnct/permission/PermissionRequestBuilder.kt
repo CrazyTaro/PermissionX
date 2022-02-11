@@ -12,12 +12,12 @@ import com.permissionx.guolilndev.lincolnct.request.IScope
 class PermissionRequestBuilder private constructor() : IPermissionRequestBuilder {
     private lateinit var permissionMediator: PermissionMediator
 
-    private val localConfig = PermissionDialogRequestGlobalConfig().applyConfig(globalConfig)
+    private val localConfig = PermissionRequestDialogConfig(this).applyConfig(globalConfig)
     private val permissionHolder = mutableListOf<String>()
     private var lightColorTint: Int? = Color.WHITE
     private var darkColorTint: Int? = Color.WHITE
 
-    override fun getPermissionDialogConfig(): IPermissionConfigDialogOperation {
+    override fun beginDialogConfigTransaction(): IPermissionDialogTransaction {
         return localConfig
     }
 
@@ -95,7 +95,8 @@ class PermissionRequestBuilder private constructor() : IPermissionRequestBuilder
     }
 
     /**
-     * 设置请求时需要解释说明的弹窗，推荐使用 [getPermissionDialogConfig] 获取配置接口配置本次显示的 dialog 配置
+     * 设置所有弹窗类型的自定义弹窗样式接口
+     * @see [beginDialogConfigTransaction]
      */
     fun setExplainDialog(dialog: PermissionExplainDialogInterface): PermissionRequestBuilder {
         this.localConfig.setExplainDialog(dialog)
@@ -103,15 +104,16 @@ class PermissionRequestBuilder private constructor() : IPermissionRequestBuilder
     }
 
     /**
-     * 设置请求时需要解释说明的弹窗，推荐使用 [getPermissionDialogConfig] 获取配置接口配置本次显示的 dialog 配置
+     * 设置全部弹窗类型都需要显示出权限分组的说明信息
+     * @see [beginDialogConfigTransaction]
      */
-    fun setExplainDialog(type: PermissionDialogType, dialog: PermissionExplainDialogInterface): PermissionRequestBuilder {
-        this.localConfig.setExplainDialog(type, dialog)
+    fun setShowPermissionGroupExplainTipsEnabled(show: Boolean): PermissionRequestBuilder {
+        this.localConfig.setShowPermissionGroupExplainTipsEnabled(show)
         return this
     }
 
     /**
-     * 设置权限组的说明提示，推荐使用 [getPermissionDialogConfig] 获取配置接口配置本次显示的 dialog 配置
+     * 设置权限组的说明提示，推荐使用 [beginDialogConfigTransaction] 获取配置接口配置本次显示的 dialog 配置
      */
     fun setPermissionGroupExplainTips(permission: String, tips: String): PermissionRequestBuilder {
         this.localConfig.setPermissionGroupExplainTips(permission, tips)
@@ -128,13 +130,16 @@ class PermissionRequestBuilder private constructor() : IPermissionRequestBuilder
                 val requestReason = localConfig.getExplainDialogConfigEnsureExist(PermissionDialogType.EXPLAIN_REQUEST_REASON).message
                 val deniedReason = localConfig.getExplainDialogConfigEnsureExist(PermissionDialogType.EXPLAIN_DENIED_TIPS).message
                 val settingReason = localConfig.getExplainDialogConfigEnsureExist(PermissionDialogType.EXPLAIN_FORWARD_SETTING_TIPS).message
-                //如果存在请求权限原因，则配置请求权限前的提示
-                if (requestReason.isNotEmpty()) {
+                if (requestReason.isNotEmpty() || deniedReason.isNotEmpty()) {
                     explainReasonBeforeRequest()
                     onExplainRequestReason { scope, deniedList, beforeRequest ->
                         if (beforeRequest) {
-                            processExplainDialog(scope, deniedList, activity, PermissionDialogType.EXPLAIN_REQUEST_REASON)
+                            //如果存在请求权限原因，则配置请求权限前的提示
+                            if (requestReason.isNotEmpty()) {
+                                processExplainDialog(scope, deniedList, activity, PermissionDialogType.EXPLAIN_REQUEST_REASON)
+                            }
                         } else if (!beforeRequest) {
+                            //如果存在拒绝权限的请求，则配置拒绝时的提示
                             if (deniedReason.isNotEmpty()) {
                                 processExplainDialog(scope, deniedList, activity, PermissionDialogType.EXPLAIN_DENIED_TIPS)
                             } else {
@@ -142,11 +147,6 @@ class PermissionRequestBuilder private constructor() : IPermissionRequestBuilder
                                 showDialogCalled = false
                             }
                         }
-                    }
-                } else if (deniedReason.isNotEmpty()) {
-                    //如果存在拒绝权限的请求，则配置拒绝时的提示
-                    onExplainRequestReason { scope, deniedList ->
-                        processExplainDialog(scope, deniedList, activity, PermissionDialogType.EXPLAIN_DENIED_TIPS)
                     }
                 }
                 if (settingReason.isNotEmpty()) {
@@ -178,7 +178,7 @@ class PermissionRequestBuilder private constructor() : IPermissionRequestBuilder
                 ?: false
             if (!processByUser) {
                 if (localConfig.isShowPermissionGroupExplainTipsEnabled(type)) {
-                    config.permissionTips = localConfig.generateDefaultPermissionGroupExplainTips(deniedList)
+                    config.permissionTips = localConfig.generateDefaultPermissionGroupExplainTips(activity, deniedList)
                 }
             }
             it.setDialogConfig(config)
@@ -220,3 +220,40 @@ class PermissionRequestBuilder private constructor() : IPermissionRequestBuilder
     }
 }
 
+internal class PermissionRequestDialogConfig(private val builder: PermissionRequestBuilder) :
+    PermissionDialogRequestGlobalConfig(), IPermissionDialogTransaction {
+
+    override fun setExplainDialogDelegate(delegate: IPermissionDialogDelegate): IPermissionDialogTransaction {
+        super.setExplainDialogDelegate(delegate)
+        return this
+    }
+
+    override fun setExplainDialog(type: PermissionDialogType, dialog: PermissionExplainDialogInterface): IPermissionDialogTransaction {
+        super<PermissionDialogRequestGlobalConfig>.setExplainDialog(type, dialog)
+        return this
+    }
+
+    override fun setPermissionGroupExplainTips(permission: String, tips: String): IPermissionDialogTransaction {
+        super.setPermissionGroupExplainTips(permission, tips)
+        return this
+    }
+
+    override fun setShowPermissionGroupExplainTipsEnabled(type: PermissionDialogType, show: Boolean): IPermissionDialogTransaction {
+        super<PermissionDialogRequestGlobalConfig>.setShowPermissionGroupExplainTipsEnabled(type, show)
+        return this
+    }
+
+    override fun setExplainDialogConfig(type: PermissionDialogType, dialogConfig: IPermissionDialogConfig): IPermissionDialogTransaction {
+        super.setExplainDialogConfig(type, dialogConfig)
+        return this
+    }
+
+    override fun applyConfig(config: IPermissionConfigDialogOperation): IPermissionDialogTransaction {
+        super.applyConfig(config)
+        return this
+    }
+
+    override fun endDialogConfigTransaction(): PermissionRequestBuilder {
+        return builder
+    }
+}
